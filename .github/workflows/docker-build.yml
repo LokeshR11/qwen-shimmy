@@ -1,0 +1,131 @@
+name: Build and Push Docker Image
+
+on:
+  push:
+    branches: [ main, master ]
+  workflow_dispatch:
+
+jobs:
+  build-and-push:
+    runs-on: ubuntu-latest
+    
+    steps:
+    - name: Checkout code
+      uses: actions/checkout@v3
+    
+    - name: Set up Docker Buildx
+      uses: docker/setup-buildx-action@v2
+    
+    - name: Login to Docker Hub
+      uses: docker/login-action@v2
+      with:
+        username: ${{ secrets.DOCKER_USERNAME }}
+        password: ${{ secrets.DOCKER_PASSWORD }}
+    
+    - name: Build and push Docker image
+      uses: docker/build-push-action@v4
+      with:
+        context: .
+        file: ./Dockerfile
+        push: true
+        tags: ${{ secrets.DOCKER_USERNAME }}/embedding-server:latest
+        
+    - name: Image digest
+      run: echo "Image pushed successfully!"
+```
+
+4. Click "**Commit changes**"
+5. Click "**Commit changes**" again
+
+---
+
+## Step 3: Add Docker Hub Credentials to GitHub
+
+### **Part A: Get Docker Hub Access Token**
+
+1. Go to: https://hub.docker.com/
+2. Login to Docker Hub
+3. Click your **username** (top right) → **Account Settings**
+4. Click **Security** (left sidebar)
+5. Click **New Access Token**
+   - Description: `GitHub Actions`
+   - Permissions: **Read, Write, Delete**
+6. Click **Generate**
+7. **COPY THE TOKEN** (you won't see it again!)
+
+### **Part B: Add Secrets to GitHub**
+
+1. Go back to your GitHub repository
+2. Click **Settings** (top menu)
+3. Click **Secrets and variables** → **Actions** (left sidebar)
+4. Click **New repository secret**
+
+**Add Secret 1:**
+- Name: `DOCKER_USERNAME`
+- Value: `your-docker-hub-username` (example: `lokr`)
+- Click **Add secret**
+
+**Add Secret 2:**
+- Click **New repository secret** again
+- Name: `DOCKER_PASSWORD`
+- Value: `paste-your-docker-hub-token-here`
+- Click **Add secret**
+
+---
+
+## Step 4: Trigger the Build
+
+### **Option A: Automatic (Push a change)**
+
+1. Edit any file (like add a comment to Dockerfile)
+2. Commit the change
+3. GitHub Actions starts automatically!
+
+### **Option B: Manual (Run workflow)**
+
+1. Click **Actions** tab (top menu)
+2. Click **Build and Push Docker Image** (left sidebar)
+3. Click **Run workflow** (right side)
+4. Click **Run workflow** button
+
+---
+
+## Step 5: Watch the Build
+
+1. Click **Actions** tab
+2. You'll see a running workflow (yellow dot)
+3. Click on it to see progress
+4. Build takes **5-10 minutes**
+
+You'll see:
+```
+✅ Checkout code
+✅ Set up Docker Buildx
+✅ Login to Docker Hub
+⏳ Build and push Docker image (5-10 min)
+✅ Image digest
+```
+
+---
+
+## Step 6: Verify on Docker Hub
+
+1. Go to: https://hub.docker.com/
+2. Login
+3. Go to **Repositories**
+4. You should see: `youruser/embedding-server`
+5. Click on it
+6. You should see tag: `latest` (~2 GB)
+
+✅ **Success! Your Docker image is built and pushed!**
+
+---
+
+## Your Repository Structure
+```
+qwen/ (or whatever name you chose)
+├── .github/
+│   └── workflows/
+│       └── docker-build.yml
+├── Dockerfile
+└── serve_embedding.py
