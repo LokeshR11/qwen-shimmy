@@ -17,10 +17,10 @@ spec:
         type: string
         default: "infer.s"
   template:
-    apiVersion: "serving.kserve.io/v1beta1"
+    apiVersion: serving.kserve.io/v1beta1
     metadata:
       annotations:
-        autoscaling.knative.dev/metric: "concurrency"
+        autoscaling.knative.dev/metric: concurrency
         autoscaling.knative.dev/target: "1"
       labels:
         ai.sap.com/resourcePlan: "{{inputs.parameters.resourcePlan}}"
@@ -30,14 +30,14 @@ spec:
         maxReplicas: 1
         containers:
           - name: kserve-container
-            image: "docker.io/lokeshr11/embedding-server:latest"
+            image: docker.io/lokeshr11/embedding-server:latest
             ports:
               - containerPort: 8080
                 protocol: TCP
             resources:
               requests:
-                memory: "4Gi"
+                memory: 4Gi
                 cpu: "2"
               limits:
-                memory: "8Gi"
+                memory: 8Gi
                 cpu: "4"
