@@ -3,36 +3,37 @@ kind: ServingTemplate
 metadata:
   name: embedding-server
   annotations:
-    scenarios.ai.sap.com/description: "Embedding API Server using sentence-transformers"
+    scenarios.ai.sap.com/description: "Embedding API Server"
     scenarios.ai.sap.com/name: "embedding-server"
-    executables.ai.sap.com/description: "REST API for text embeddings and similarity"
+    executables.ai.sap.com/description: "REST API for text embeddings"
     executables.ai.sap.com/name: "embedding-api"
   labels:
     scenarios.ai.sap.com/id: "embedding-server"
     ai.sap.com/version: "1.0.0"
 spec:
+  inputs:
+    parameters:
+      - name: resourcePlan
+        type: string
+        default: "infer.s"
   template:
     apiVersion: "serving.kserve.io/v1beta1"
     metadata:
-      annotations: |
-        autoscaling.knative.dev/metric: concurrency
-        autoscaling.knative.dev/target: 1
-        autoscaling.knative.dev/targetBurstCapacity: 0
-      labels: |
-        ai.sap.com/resourcePlan: infer.s
+      annotations:
+        autoscaling.knative.dev/metric: "concurrency"
+        autoscaling.knative.dev/target: "1"
+      labels:
+        ai.sap.com/resourcePlan: "{{inputs.parameters.resourcePlan}}"
     spec:
       predictor:
         minReplicas: 1
         maxReplicas: 1
         containers:
-          - name: embedding-server
-            image: docker.io/lokeshr11/embedding-server:latest
+          - name: kserve-container
+            image: "docker.io/lokeshr11/embedding-server:latest"
             ports:
               - containerPort: 8080
                 protocol: TCP
-            env:
-              - name: PORT
-                value: "8080"
             resources:
               requests:
                 memory: "4Gi"
