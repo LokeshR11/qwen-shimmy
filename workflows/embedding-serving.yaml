@@ -19,18 +19,18 @@ spec:
   template:
     apiVersion: serving.kserve.io/v1beta1
     metadata:
-      annotations:
+      annotations: |
         autoscaling.knative.dev/metric: "concurrency"
         autoscaling.knative.dev/target: "1"
-      labels:
+      labels: |
         ai.sap.com/resourcePlan: "{{inputs.parameters.resourcePlan}}"
-    spec:
+    spec: |
       predictor:
         minReplicas: 1
         maxReplicas: 1
         containers:
           - name: kserve-container
-            image: "docker.io/lokeshr11/embedding-server:latest"
+            image: "docker.io/lokeshhr11/embedding-server:latest"
             ports:
               - containerPort: 8080
                 protocol: TCP
